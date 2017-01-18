@@ -10,6 +10,7 @@ namespace Calc
     {
         static void Main(string[] args)
         {
+
         }
     }
 }

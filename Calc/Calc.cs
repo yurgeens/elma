@@ -8,21 +8,33 @@ namespace Calc
 {
     public class Calc
     {
-        public int Sum(int x, int y)
-        {
-            return (int)Execute("Sum", new object[] { x, y });
-        }
-        private IOperation[] operations { get; set; }
+        private IEnumerable<IOperation> operations { get; set; }
         public object Execute(string name, object[] args)
         {
-            var oper = operations.FirstOrDefault(o => o.Name == name);
+
+            var oper = operations.FirstOrDefault(o => o.Name == name.ToLower());//Выбирается нужный оператор с преобразованием регистра в нижний
             return oper.Execute(args);
         }
         public Calc(IOperation[] opers)
         {
             operations = opers;
         }
+        public Calc(IEnumerable<IOperation> opers)
+        {
+            operations = opers;
+        }
+        /// <summary>
+        /// Возвращает имена операций
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerable<String> GetOperationNames()
+        {
+            return operations.Select(o => o.Name);
+        }
     }
+    /// <summary>
+    /// интерфейс для классов-операций
+    /// </summary>
     public interface IOperation
     {
         string Name { get; }
@@ -30,10 +42,29 @@ namespace Calc
     }
     public class SumOperation : IOperation
     {
-        public string Name { get { return "Sum"; } }
+        public string Name { get { return "summ"; } }
         public object Execute(object[] args)
         {
-            return (int)args[0] + (int)args[1];
+            int sum = 0;
+            for (int i = 0; i < args.Count(); i++)
+            {
+                sum = sum + Convert.ToInt32(args[i]);
+            }
+            return sum;
         }
     }
+    public class RaznOperation : IOperation
+    {
+        public string Name { get { return "razn"; } }
+        public object Execute(object[] args)
+        {
+            int raz = Convert.ToInt32(args[0]);
+
+            for (int i = 1; i < args.Count(); i++)
+            {
+                raz -= Convert.ToInt32(args[i]);
+            }
+            return raz;
+        }
+    }     
 }
