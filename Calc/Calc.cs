@@ -66,5 +66,27 @@ namespace Calc
             }
             return raz;
         }
-    }     
+    }
+
+    public class StepenOperation : IOperation
+    {
+        public string Name { get { return "step"; } }
+        public object Execute(object[] args)
+        {
+            return Math.Pow((int)args[0], (int)args[1]);
+        }
+    }
+    public class FactorOperation : IOperation
+    {
+        public string Name { get { return "fact"; } }
+        public object Execute(object[] args)
+        {
+            int fac = 1;
+            for (int i = (int)args[0]; i != 0; i--)
+            {
+                fac *= i;
+            }
+            return fac;
+        }
+    }
 }

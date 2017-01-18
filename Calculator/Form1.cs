@@ -31,7 +31,7 @@ namespace Calculator
             var files = Directory.GetFiles(Environment.CurrentDirectory, "*.dll");
             foreach (var file in files)
             {
-                var assembly = Assembly.GetAssembly(typeof(IOperation));
+                var assembly = Assembly.LoadFile(file);
                 var types = assembly.GetTypes();//.Where(t => t.GetInterface());
                 foreach (var type in types)
                 {
