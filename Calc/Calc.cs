@@ -12,8 +12,21 @@ namespace Calc
         public object Execute(string name, object[] args)
         {
 
-            var oper = operations.FirstOrDefault(o => o.Name == name.ToLower());//Выбирается нужный оператор с преобразованием регистра в нижний
-            return oper.Execute(args);
+            var opers = operations.Where(o => o.Name == name.ToLower());//Выбирается нужный оператор с преобразованием регистра в нижний
+            if (!opers.Any())
+            { return $"Operation\" {name}\"not found"; }
+            //Из всех операций выделяем только операции с заданным количеством аргументов
+            var opersWithCount = opers.OfType<IOperationCount>();
+            IOperation oper = opersWithCount.FirstOrDefault(o => o.Count == args.Count()) ?? opers.FirstOrDefault();
+            if (oper==null)
+            {
+                oper = opers.FirstOrDefault();
+            }
+            if (oper == null)
+            {
+                return $"Operation\" {name}\"not found";
+            }
+                return oper.Execute(args);
         }
         public Calc(IOperation[] opers)
         {
@@ -39,6 +52,11 @@ namespace Calc
     {
         string Name { get; }
         object Execute(object[] args);
+    }
+    public interface IOperationCount: IOperation
+    {
+        //Количество аргументов в операции
+        int Count { get; }
     }
     public class SumOperation : IOperation
     {
@@ -87,6 +105,20 @@ namespace Calc
                 fac *= i;
             }
             return fac;
+        }
+    }
+    public class DivOperation: IOperationCount
+    {
+        public int Count { get { return 1; } }
+        public string Name { get { return "summ"; } }
+        public object Execute(object[] args)
+        {
+            int sum = 0;
+            for (int i = 0; i < args.Count(); i++)
+            {
+                sum = sum + Convert.ToInt32(args[i]);
+            }
+            return sum;
         }
     }
 }
