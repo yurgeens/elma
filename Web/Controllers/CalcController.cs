@@ -1,31 +1,54 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+﻿using System.Linq;
 using System.Web.Mvc;
 using Calc;
 using Web.Models;
+using Web.Services;
+using System.Diagnostics;
 
 namespace Web.Controllers
 {
-    [Authorize]
     public class CalcController : Controller
     {
+        private IOperationResultRepostiory repository { get; set; }
+
+        public CalcController()
+        {
+            repository = new OperationResultRepostiory();
+        }
+
         // GET: Calc
         public ActionResult Index()
         {
+            var opers = CalcService.GetInstance().Calculator.GetOperationNames().Select(o => new SelectListItem() { Text = o, Value = o });
+            ViewBag.Operations = opers;
             return View(new OperationModel());
         }
-        
+
         public ActionResult Execute(OperationModel model)
         {
-            //HttpContext.Request["Name"]; валидация 
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
                 return View("Index", model);
             }
-            var calc = new Calc.Calc(new IOperation[] { new SumOperation(), new RaznOperation()  });
-            var result = calc.Execute(model.Name, model.GetParameters());
+
+            Stopwatch stopWatch = new Stopwatch();
+            stopWatch.Start();
+
+            var result = CalcService.GetInstance().Calculator.Execute(model.Name, model.GetParameters());
+
+            stopWatch.Stop();
+
+            var operResult = repository.Create();
+
+            operResult.ArgumentCount = model.GetParameters().Count();
+            operResult.Arguments = string.Join(",", model.GetParameters());
+           // operResult.OperationID = repository.
+            operResult.Operation = repository.FindOperByName(model.Name);
+            operResult.Result = result.ToString();
+            operResult.ExecTimeMs = stopWatch.ElapsedMilliseconds;
+
+            repository.Update(operResult);
+
             ViewData.Model = $"result = {result}";
             return View();
         }
