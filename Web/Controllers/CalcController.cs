@@ -2,10 +2,10 @@
 using System.Web.Mvc;
 using Calc;
 using Web.Models;
-using Web.Services;
 using System.Diagnostics;
+using Services;
 
-namespace Web.Controllers
+namespace Controllers
 {
     public class CalcController : Controller
     {
@@ -13,7 +13,7 @@ namespace Web.Controllers
 
         public CalcController()
         {
-            repository = new OperationResultRepostiory();
+            repository = new NHOperationResultRepostiory();
         }
 
         // GET: Calc

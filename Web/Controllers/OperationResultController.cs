@@ -1,5 +1,6 @@
-﻿using System.Web.Mvc;
-using Web.Services;
+﻿using Services;
+using System.Linq;
+using System.Web.Mvc;
 
 namespace Web.Controllers
 {
@@ -9,7 +10,7 @@ namespace Web.Controllers
 
         public OperationResultController()
         {
-            repository = new OperationResultRepostiory();
+            repository = new NHOperationResultRepostiory();
         }
 
         //GET: OperationResult
@@ -17,7 +18,7 @@ namespace Web.Controllers
         {
             // нужно фильтровать операции - выводить только те, которые выполнялись дольше 1 секунды
 
-            var operations = repository.GetAll();
+            var operations = repository.GetAll().OrderByDescending(it=> it.Id).Take(5);
 
             return View(operations);
         }
